@@ -6,16 +6,15 @@ int main(int argc, char** argv)
 {
     printf("NumArgs: %d\n", argc);
 
-    FILE* file;
-    char filename[200];
-    // char *newline;
-    // printf("Before");
-    if (fgets(filename, sizeof(filename), stdin) == NULL)
+    char* line = NULL;
+    size_t len = 0;
+    size_t lineSize = 0;
+
+    char name[10];
+    while (fgets(name, 10, stdin))
     {
-        printf("Error");
-        return -1; // Input error / EOF
+        printf("Hello %s", name);
     }
 
-    printf("Content: %s", filename);
     return 0;
 }
