@@ -3,6 +3,9 @@
 #include <string.h>
 #define LINE_SIZE 20
 
+// ====================================== //
+// Utilities
+// ====================================== //
 inline int readNumber(char* input)
 {
     int ret;
@@ -37,6 +40,10 @@ void testMatrix(int** matrix, int size)
         printf("\n");
     }
 }
+
+// ====================================== //
+// Shortest Path Tree
+// ====================================== //
 
 int main(int argc, char** argv)
 {
