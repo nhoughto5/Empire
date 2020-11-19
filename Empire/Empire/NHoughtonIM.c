@@ -11,20 +11,31 @@ inline int readNumber(char* input)
     return ret;
 }
 
-int* readLine(char* input, int size)
+int* readLine(char* input, int* row, int size)
 {
-    // Allocate an array of the size of the row the matrix
-    int* ret = (int*)malloc(size * sizeof(int));
     char* str = strtok(input, " ");
     int i = 0;
     while (str != NULL)
     {
         int value = readNumber(str);
-        ret[i] = value;
+        row[i] = value;
         str = strtok(NULL, " ");
         ++i;
     }
-    return ret;
+    return row;
+}
+
+void testMatrix(int** matrix, int size)
+{
+    printf("Test\n");
+    for (int i = 0; i < size-1; ++i)
+    {
+        for (int j = 0; j <= i; ++j)
+        {
+            printf("%d ", matrix[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 int main(int argc, char** argv)
@@ -38,13 +49,27 @@ int main(int argc, char** argv)
     N = readNumber(line);
 
     // Create an array of arrays size N
-    int** matrix = (int**)malloc(N * sizeof(int));
-    int i = 1;
+    int** matrix = (int**)malloc((N - 1) * sizeof(int));
+    for (int i = 0; i < (N - 1); i++)
+    {
+        matrix[i] = (int*)malloc((i + 1) * sizeof(int));
+    }
+        
+    int i = 0;
     while (fgets(line, LINE_SIZE, stdin))
     {
-        matrix[i] = readLine(line, i);
+        matrix[i] = readLine(line, matrix[i], i);
         ++i;
     }
+    //for (int i = 0; i < N-1; ++i)
+    //{
+    //    for (int j = 0; j <= i; j++)
+    //    {
+    //        matrix[i][j] = i;
+    //    }
+    //}
+
+    testMatrix(matrix, N - 1);
 
     return 0;
 }
