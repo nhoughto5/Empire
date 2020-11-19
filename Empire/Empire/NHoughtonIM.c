@@ -13,17 +13,17 @@ inline int readNumber(char* input)
 
 int* readLine(char* input, int size)
 {
+    // Allocate an array of the size of the row the matrix
     int* ret = (int*)malloc(size * sizeof(int));
-    printf("Line:");
     char* str = strtok(input, " ");
+    int i = 0;
     while (str != NULL)
     {
-        //printf(" %s", str);
-        printf(" %d", readNumber(str));
+        int value = readNumber(str);
+        ret[i] = value;
         str = strtok(NULL, " ");
+        ++i;
     }
-
-    printf("\n");
     return ret;
 }
 
@@ -42,15 +42,7 @@ int main(int argc, char** argv)
     int i = 1;
     while (fgets(line, LINE_SIZE, stdin))
     {
-        //printf("Line %s\n", line);
         matrix[i] = readLine(line, i);
-        //char* tokens = strtok(line, " "); // seperate by spaces
-        //while (tokens != NULL)
-        //{
-        //    //printf("Number: %s", tokens);
-        //    tokens = strtok(NULL, " ");
-        //    if (tokens != NULL) printf("A Number: %d", readNumber(tokens));
-        //}
         ++i;
     }
 
