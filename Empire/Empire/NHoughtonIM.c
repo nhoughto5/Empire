@@ -28,7 +28,7 @@ int* readLine(char* input, int* row, int size)
 void testMatrix(int** matrix, int size)
 {
     printf("Test\n");
-    for (int i = 0; i < size-1; ++i)
+    for (int i = 0; i < size; ++i)
     {
         for (int j = 0; j <= i; ++j)
         {
@@ -61,13 +61,6 @@ int main(int argc, char** argv)
         matrix[i] = readLine(line, matrix[i], i);
         ++i;
     }
-    //for (int i = 0; i < N-1; ++i)
-    //{
-    //    for (int j = 0; j <= i; j++)
-    //    {
-    //        matrix[i][j] = i;
-    //    }
-    //}
 
     testMatrix(matrix, N - 1);
 
