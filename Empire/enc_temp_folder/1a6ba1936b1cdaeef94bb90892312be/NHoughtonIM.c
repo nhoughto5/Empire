@@ -75,6 +75,7 @@ void createAndSortRoutes(struct Route* routes, int** matrix, int numCities, int 
             struct Route* route = malloc(sizeof(struct Route));
             if (route != NULL)
             {
+                //printf("Route: %d -> %d   = %d\n", j,i, matrix[i-1][j]);
                 route->cityA = j;
                 route->cityB = i;
                 route->time = matrix[i-1][j];
@@ -100,7 +101,7 @@ int findMinimumTime(int** matrix, int numCities)
 
     createAndSortRoutes(routes, matrix, numCities, numberOfRoutes);
 
-    printf("\n\nSorted \n");
+    printf("\n\n Sorted \n");
     for (int i = 0; i < numberOfRoutes; ++i)
     {
         printf("Route: %d -> %d   = %d\n", routes[i].cityA, routes[i].cityB, routes[i].time);

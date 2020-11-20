@@ -100,7 +100,7 @@ int findMinimumTime(int** matrix, int numCities)
 
     createAndSortRoutes(routes, matrix, numCities, numberOfRoutes);
 
-    printf("\n\nSorted \n");
+    printf("\n\n Sorted \n");
     for (int i = 0; i < numberOfRoutes; ++i)
     {
         printf("Route: %d -> %d   = %d\n", routes[i].cityA, routes[i].cityB, routes[i].time);
