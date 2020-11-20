@@ -82,23 +82,24 @@ void createAndSortRoutes(struct Route* routes, int** matrix, int numCities, int 
     qsort(routes, numRoutes, sizeof(struct Route), routeSort);
 }
 
-void DepthSearch(int n, bool* visited, int numCities, int** adj) {
+void DepthSearch(int n, bool* visited, int numCities, int** adj, int sum, int* result) {
     visited[n] = true;
-    printf("visited: %d\n", n);
+    result[n] = sum;
+    printf("visited: %d, weight: %d\n", n, sum);
     for (int i = 0; i < numCities; ++i) {
         if (!visited[i]) {
-            DepthSearch(i, visited, numCities, adj);
+            DepthSearch(i, visited, numCities, adj, sum + adj[i], result);
         }
     }
 }
 
-int findMinimumTime(int** matrix, int numCities) {
+int findMinimumTime(int** matrix, int numCities, int* result) {
     bool* visited = calloc(numCities, sizeof(bool));
     for (int i = 0; i < numCities; ++i) {
         visited[i] = false;
     }
-
-    DepthSearch(numCities, visited, numCities, matrix);
+    int sum = 0;
+    DepthSearch(numCities, visited, numCities, matrix, sum, result);
     return 0;
 }
 
@@ -128,13 +129,14 @@ int main(int argc, char** argv) {
     }
 
     int i = 0;
+
     while (fgets(line, LINE_SIZE, stdin)) {
         matrix[i] = readLine(line, matrix[i], i);
         ++i;
     }
 
-    //testMatrix(matrix, N - 1);
-    printf("%d", findMinimumTime(matrix, N));
+    int* result = (int*)malloc(N * sizeof(int));
+    printf("%d", findMinimumTime(matrix, N, result));
     free(matrix);
     return 0;
 }
