@@ -100,6 +100,9 @@ int findMinimumTime(int** matrix, int numCities)
 
     createAndSortRoutes(routes, matrix, numCities, numberOfRoutes);
 
+
+
+
     printf("\n\nSorted \n");
     for (int i = 0; i < numberOfRoutes; ++i)
     {
@@ -110,6 +113,16 @@ int findMinimumTime(int** matrix, int numCities)
     return 0;
 }
 
+/*
+Began this problem by reacquainting myself with C99 as it has been a long time since I have used it. 
+It took a little while to figure out the best dev environment but I went with visual studio even though its implementation of C99 is missing some features.
+
+I then proceeded to tackle some basics, reading standard input, parsing the input and storing it into a usable matrix format. 
+I then spent some time converting that matrix into a more useable format by using C99’s struct features.
+
+I then attempted to use Kruskals’s minimum spanning tree algorithm to attempt to 
+find the shortest path from the “capital” to each city but it quickly became apparent that this was not the correct solution.
+*/
 int main(int argc, char** argv)
 {
     char line[LINE_SIZE];
