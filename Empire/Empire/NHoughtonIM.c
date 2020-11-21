@@ -27,9 +27,9 @@ int* readLine(char* input, int* row, int size) {
 }
 
 void testMatrix(int** matrix, int size) {
-    printf("Test\n");
-    for (int i = 0; i < size-1; ++i) {
-        for (int j = 0; j <= i; ++j) {
+    for (int i = 0; i < (size - 1); i++) {
+        for (int j = 0; j < size - 1 - i; ++j)
+        {
             printf("%d ", matrix[i][j]);
         }
         printf("\n");
@@ -50,9 +50,44 @@ int findSmallestInArray(int* arr, int n)
     return index;
 }
 
+void printArray(int* arr, int n)
+{
+    for (int i = 0; i < n-1; ++i)
+    {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+void printBoolArray(bool* arr, int n)
+{
+    for (int i = 0; i < n - 1; ++i)
+    {
+        bool v = arr[i];
+        printf("%s ", v ? "true" : "false");
+    }
+    printf("\n");
+}
+
 // ====================================== //
 // Dijkstra's
 // ====================================== //
+
+int findClosestNonVisitedCity(int numCities, int* weights, bool* visited)
+{
+    int smallest = INT_MAX;
+    int index = -1;
+    for (int i = 0; i < numCities-1; ++i)
+    {
+        if (!visited[i] && weights[i] < smallest)
+        {
+            smallest = weights[i];
+            index = i;
+        }
+    }
+
+    return index;
+}
 
 int disjkstras(int numCities, int** graph)
 {
@@ -65,12 +100,28 @@ int disjkstras(int numCities, int** graph)
     shortest[0] = 0;
     for (int i = 0; i < numCities; ++i)
     {
-        if (i > 0) shortest = INT_MAX;
+        if (i > 0) shortest[i] = INT_MAX;
         visited[i] = false;
         unvisted[i] = true;
     }
 
+    //printBoolArray(visited, numCities);
+
     int currentCity = 0;
+    for (int i = 0; i < numCities - 1; ++i)
+    {
+        if (shortest[i] > graph[currentCity][i])
+        {
+            shortest[i] = graph[currentCity][i];
+            previous[i] = currentCity;
+        }
+    }
+    visited[currentCity] = true;
+    unvisted[currentCity] = false;
+
+    printArray(shortest, numCities);
+    //printBoolArray(visited, numCities);
+    currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
 
 
     return 0;
@@ -101,10 +152,8 @@ int main(int argc, char** argv) {
     // Invert the matrix to make dijkstra easier
     int** matrix = (int**)malloc((N - 1) * sizeof(int));
     for (int i = 0; i < (N - 1); i++) {
-        matrix[i] = (int*)malloc((i+1) * sizeof(int));
+        matrix[i] = (int*)malloc((i + 1) * sizeof(int));
     }
-
-
 
     int ii = 0;
     while (fgets(line, LINE_SIZE, stdin)) {
@@ -118,15 +167,13 @@ int main(int argc, char** argv) {
         for (int j = i; j < N - 1; ++j)
         {
             int t = matrix[j][i];
-            transposedMatrix[i][j] = matrix[j][i];
-            printf("%d ", t);
+            transposedMatrix[i][j-i] = matrix[j][i];
         }
-        printf("\n");
     }
-
-    testMatrix(matrix, N);
-
-    printf("%d", disjkstras(N, matrix));
+    testMatrix(transposedMatrix, N);
     free(matrix);
+
+    printf("%d", disjkstras(N, transposedMatrix));
+    free(transposedMatrix);
     return 0;
 }
