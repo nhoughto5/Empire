@@ -52,7 +52,7 @@ int findSmallestInArray(int* arr, int n)
 
 void printArray(int* arr, int n)
 {
-    for (int i = 0; i < n-1; ++i)
+    for (int i = 0; i < n; ++i)
     {
         printf("%d ", arr[i]);
     }
@@ -77,7 +77,7 @@ int findClosestNonVisitedCity(int numCities, int* weights, bool* visited)
 {
     int smallest = INT_MAX;
     int index = -1;
-    for (int i = 0; i < numCities-1; ++i)
+    for (int i = 0; i < numCities; ++i)
     {
         if (!visited[i] && weights[i] < smallest)
         {
@@ -108,20 +108,28 @@ int disjkstras(int numCities, int** graph)
     //printBoolArray(visited, numCities);
 
     int currentCity = 0;
-    for (int i = 0; i < numCities - 1; ++i)
+    while (true)
     {
-        if (shortest[i] > graph[currentCity][i])
+        printArray(shortest, numCities);
+        printArray(graph[currentCity], numCities - currentCity - 1);
+        for (int i = 0; i < numCities - currentCity; ++i)
         {
-            shortest[i] = graph[currentCity][i];
-            previous[i] = currentCity;
+            int s = shortest[i + 1];
+            int g = graph[currentCity][i];
+            if (shortest[i+1] > graph[currentCity][i])
+            {
+                shortest[i+1] = graph[currentCity][i];
+                previous[i+1] = currentCity;
+            }
         }
-    }
-    visited[currentCity] = true;
-    unvisted[currentCity] = false;
+        visited[currentCity] = true;
+        unvisted[currentCity] = false;
 
-    printArray(shortest, numCities);
-    //printBoolArray(visited, numCities);
-    currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
+        printArray(shortest, numCities);
+        //printBoolArray(visited, numCities);
+        currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
+    }
+
 
 
     return 0;
@@ -167,7 +175,7 @@ int main(int argc, char** argv) {
         for (int j = i; j < N - 1; ++j)
         {
             int t = matrix[j][i];
-            transposedMatrix[i][j-i] = matrix[j][i];
+            transposedMatrix[i][j - i] = matrix[j][i];
         }
     }
     testMatrix(transposedMatrix, N);
