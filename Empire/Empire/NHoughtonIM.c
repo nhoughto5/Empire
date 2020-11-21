@@ -28,7 +28,7 @@ int* readLine(char* input, int* row, int size) {
 
 void testMatrix(int** matrix, int size) {
     printf("Test\n");
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size-1; ++i) {
         for (int j = 0; j <= i; ++j) {
             printf("%d ", matrix[i][j]);
         }
@@ -36,70 +36,43 @@ void testMatrix(int** matrix, int size) {
     }
 }
 
-// ====================================== //
-// Minimum Spanning Tree
-// ====================================== //
-
-struct Route {
-    int cityA, cityB, time;
-};
-
-int routeSort(const void* a, const void* b) {
-    struct Route* routeA = (struct Route*)a;
-    struct Route* routeB = (struct Route*)b;
-    int ret = 0;
-
-    if (routeA->time > routeB->time) {
-        ret = 1;
-    }
-    else {
-        ret = -1;
-    }
-
-    return ret;
-}
-
-void createAndSortRoutes(struct Route* routes, int** matrix, int numCities, int numRoutes) {
-    int routeNum = 0;
-    for (int i = 1; i <= (numCities - 1); ++i) {
-        for (int j = 0; j < i; ++j) {
-            struct Route* route = malloc(sizeof(struct Route));
-            if (route != NULL) {
-                route->cityA = j;
-                route->cityB = i;
-                route->time = matrix[i - 1][j];
-                printf("Route: %d -> %d   = %d\n", route->cityA, route->cityB, route->time);
-                routes[routeNum] = *route;
-                ++routeNum;
-            }
-            else {
-                fprintf(stderr, "Failed to create Route on heap");
-                exit(-1);
-            }
+int findSmallestInArray(int* arr, int n)
+{
+    int smallest = INT_MAX, index = 0;
+    for (int i = 0; i < n; ++i)
+    {
+        if (arr[i] < n)
+        {
+            smallest = arr[i];
+            index = i;
         }
     }
-
-    qsort(routes, numRoutes, sizeof(struct Route), routeSort);
+    return index;
 }
 
-void DepthSearch(int n, bool* visited, int numCities, int** adj, int sum, int* result) {
-    visited[n] = true;
-    result[n] = sum;
-    printf("visited: %d, weight: %d\n", n, sum);
-    for (int i = 0; i < numCities; ++i) {
-        if (!visited[i]) {
-            DepthSearch(i, visited, numCities, adj, sum + adj[i], result);
-        }
-    }
-}
+// ====================================== //
+// Dijkstra's
+// ====================================== //
 
-int findMinimumTime(int** matrix, int numCities, int* result) {
-    bool* visited = calloc(numCities, sizeof(bool));
-    for (int i = 0; i < numCities; ++i) {
+int disjkstras(int numCities, int** graph)
+{
+    int* previous = (int*)malloc((numCities) * sizeof(int));
+    int* shortest = (int*)malloc((numCities) * sizeof(int));
+    bool* visited = (bool*)malloc((numCities) * sizeof(bool));
+    bool* unvisted = (bool*)malloc((numCities) * sizeof(bool));
+
+    // Init trackers
+    shortest[0] = 0;
+    for (int i = 0; i < numCities; ++i)
+    {
+        if (i > 0) shortest = INT_MAX;
         visited[i] = false;
+        unvisted[i] = true;
     }
-    int sum = 0;
-    DepthSearch(numCities, visited, numCities, matrix, sum, result);
+
+    int currentCity = 0;
+
+
     return 0;
 }
 
@@ -112,6 +85,8 @@ I then spent some time converting that matrix into a more useable format by usin
 
 I then attempted to use Kruskals’s minimum spanning tree algorithm to attempt to
 find the shortest path from the “capital” to each city but it quickly became apparent that this was not the correct solution.
+
+I then rememberd that Dijkstra's was a fairly standrad way to visit every node so I tried that next.
 */
 int main(int argc, char** argv) {
     char line[LINE_SIZE];
@@ -123,20 +98,35 @@ int main(int argc, char** argv) {
     N = readNumber(line);
 
     // Create an array of arrays size N
+    // Invert the matrix to make dijkstra easier
     int** matrix = (int**)malloc((N - 1) * sizeof(int));
     for (int i = 0; i < (N - 1); i++) {
-        matrix[i] = (int*)malloc((i + 1) * sizeof(int));
+        matrix[i] = (int*)malloc((i+1) * sizeof(int));
     }
 
-    int i = 0;
 
+
+    int ii = 0;
     while (fgets(line, LINE_SIZE, stdin)) {
-        matrix[i] = readLine(line, matrix[i], i);
-        ++i;
+        matrix[ii] = readLine(line, matrix[ii], ii);
+        ++ii;
     }
 
-    int* result = (int*)malloc(N * sizeof(int));
-    printf("%d", findMinimumTime(matrix, N, result));
+    int** transposedMatrix = (int**)malloc((N - 1) * sizeof(int));
+    for (int i = 0; i < (N - 1); i++) {
+        transposedMatrix[i] = (int*)malloc((N - 1 - i) * sizeof(int));
+        for (int j = i; j < N - 1; ++j)
+        {
+            int t = matrix[j][i];
+            transposedMatrix[i][j] = matrix[j][i];
+            printf("%d ", t);
+        }
+        printf("\n");
+    }
+
+    testMatrix(matrix, N);
+
+    printf("%d", disjkstras(N, matrix));
     free(matrix);
     return 0;
 }
