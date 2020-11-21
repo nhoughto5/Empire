@@ -61,7 +61,7 @@ void printArray(int* arr, int n)
 
 void printBoolArray(bool* arr, int n)
 {
-    for (int i = 0; i < n - 1; ++i)
+    for (int i = 0; i < n; ++i)
     {
         bool v = arr[i];
         printf("%s ", v ? "true" : "false");
@@ -89,6 +89,29 @@ int findClosestNonVisitedCity(int numCities, int* weights, bool* visited)
     return index;
 }
 
+bool visitedAllCities(bool* visited, int numCities)
+{
+    for (int i = 0; i < numCities; ++i)
+    {
+        if (!visited[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+int sumDistance(int numCities, int* distances)
+{
+    int count = 0;
+    for (int i = 0; i < numCities; ++i)
+    {
+        count += distances[i];
+    }
+
+    return count;
+}
+
 int disjkstras(int numCities, int** graph)
 {
     int* previous = (int*)malloc((numCities) * sizeof(int));
@@ -105,34 +128,72 @@ int disjkstras(int numCities, int** graph)
         unvisted[i] = true;
     }
 
-    //printBoolArray(visited, numCities);
+
+    //int currentCity = 0;
+    //for (int i = 0; i < numCities - 1; ++i)
+    //{
+
+    //}
+
+    //int currentCity = findClosestNonVisitedCity(numCities, shortest, visited) - 1; // 3
+    //for (int i = 0; i < numCities - currentCity - 1; ++i)
+    //{
+
+    //}
+
+
 
     int currentCity = 0;
+    visited[currentCity] = true;
+    unvisted[currentCity] = false;
+    bool initCount = false;
     while (true)
     {
-        printArray(shortest, numCities);
-        printArray(graph[currentCity], numCities - currentCity - 1);
-        for (int i = 0; i < numCities - currentCity; ++i)
+        //printArray(shortest, numCities);
+        //printArray(graph[currentCity], numCities - currentCity - 1);
+        
+        for (int i = 0; i < numCities - currentCity - 1; ++i)
         {
-            int s = shortest[i + 1];
-            int g = graph[currentCity][i];
-            if (shortest[i+1] > graph[currentCity][i])
+            if (currentCity == 0)
             {
-                shortest[i+1] = graph[currentCity][i];
-                previous[i+1] = currentCity;
+                if (shortest[currentCity + 1 + i] > graph[currentCity][i] && graph[currentCity][i] >= 0)
+                {
+                    shortest[currentCity + 1 + i] = graph[currentCity][i];
+                    previous[currentCity + 1 + i] = currentCity;
+                }
+            }
+            else
+            {
+                if (shortest[currentCity + i] > graph[currentCity][i] && graph[currentCity][i] >= 0)
+                {
+                    shortest[currentCity + i] = graph[currentCity][i];
+                    previous[currentCity + i] = currentCity;
+                }
             }
         }
-        visited[currentCity] = true;
-        unvisted[currentCity] = false;
 
+        if (initCount)
+        {
+            //printf("Visited city: %d", currentCity + 1);
+            visited[currentCity + 1] = true;
+            unvisted[currentCity + 1] = false;
+        }
+        initCount = true;
+
+        //printBoolArray(visited, numCities);
         printArray(shortest, numCities);
         //printBoolArray(visited, numCities);
-        currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
+        currentCity = findClosestNonVisitedCity(numCities, shortest, visited) - 1;
+
+        if (visitedAllCities(visited, numCities))
+        {
+            break;
+        }
     }
 
 
 
-    return 0;
+    return sumDistance(numCities, shortest);
 }
 
 /*
