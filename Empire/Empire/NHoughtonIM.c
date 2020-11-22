@@ -54,7 +54,7 @@ void printArray(int* arr, int n, bool newLine)
 {
     for (int i = 0; i < n; ++i)
     {
-        printf("%d ", arr[i]);
+        printf("%d:%d ",i, arr[i]);
     }
 
     if (newLine) printf("\n");
@@ -78,8 +78,11 @@ int findClosestNonVisitedCity(int numCities, int* weights, bool* visited)
 {
     int smallest = INT_MAX;
     int index = -1;
+
     for (int i = 1; i < numCities; ++i)
     {
+        int w = weights[i];
+        bool v = visited[i];
         if (!visited[i] && weights[i] < smallest)
         {
             smallest = weights[i];
@@ -129,7 +132,7 @@ int disjkstras(int numCities, int** graph)
     {
         if (i > 0)
         {
-            shortest[i] = INT_MAX;
+            shortest[i] = INT_MAX - 1;
             previous[i] = -1;
         }
         visited[i] = false;
@@ -146,14 +149,17 @@ int disjkstras(int numCities, int** graph)
             shortest[i + 1] = graph[0][i];
         }
     }
-
-    for (int i = 1; i < numCities - 1; ++i)
+    while(true)
     {
+        printBoolArray(visited, numCities);
         currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
         visited[currentCity] = true;
+        printArray(shortest, numCities, true);
         for (int currentlyLookingAt = 1; currentlyLookingAt < numCities; ++currentlyLookingAt)
         {
-            int g = graph[currentCity-1][currentlyLookingAt];
+            //int g = graph[currentCity-1][currentlyLookingAt];
+            //int g = graph[currentlyLookingAt-1][currentCity-1];
+            int g = graph[currentlyLookingAt-1][currentCity];
             int distanceToCurrentCity = shortest[currentCity];
             int newShort = shortest[currentlyLookingAt ];
             bool visit = visited[currentlyLookingAt];
@@ -164,6 +170,11 @@ int disjkstras(int numCities, int** graph)
                 shortest[currentlyLookingAt] = newShort;
                 previous[currentlyLookingAt] = currentCity;
             }
+        }
+
+        if (visitedAllCities(visited, numCities))
+        {
+            break;
         }
     }
 
@@ -223,9 +234,8 @@ int main(int argc, char** argv) {
             transposedMatrix[i][j] = t;
         }
     }
-    //testMatrix(transposedMatrix, N);
+    testMatrix(transposedMatrix, N);
     free(matrix);
-    
     printf("%d", disjkstras(N, transposedMatrix));
     free(transposedMatrix);
     return 0;
