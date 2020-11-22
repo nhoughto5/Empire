@@ -142,7 +142,7 @@ int disjkstras(int numCities, int** graph)
 
     int currentCity = 0;
 
-    for (int i = 0; i < numCities - 1; ++i)
+    for (int i = 0; i < numCities; ++i)
     {
         if (graph[0][i] > -1)
         {
