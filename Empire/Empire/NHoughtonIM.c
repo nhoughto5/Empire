@@ -140,6 +140,7 @@ int disjkstras(int numCities, int** graph)
 }
 
 /*
+* NOTES
 ============================================================================================================================
 Began this problem by reacquainting myself with C99 as it has been a long time since I have used it.
 It took a little while to figure out the best dev environment but I went with visual studio even though its implementation of C99 is missing some features.
