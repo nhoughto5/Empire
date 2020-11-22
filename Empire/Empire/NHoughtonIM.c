@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <assert.h>
 
 #define LINE_SIZE 20
 
@@ -29,16 +28,6 @@ int* readLine(char* input, int* row, int size) {
     return row;
 }
 
-void testMatrix(int** matrix, int size) {
-    for (int i = 0; i < size; i++) {
-        for (int j = 1; j < size; j++)
-        {
-            printf("%d:%d=%d ", i, j, matrix[i][j]);
-        }
-        printf("\n");
-    }
-}
-
 // ====================================== //
 // Dijkstra's
 // ====================================== //
@@ -50,8 +39,6 @@ int findClosestNonVisitedCity(int numCities, int* weights, bool* visited)
 
     for (int i = 1; i < numCities; ++i)
     {
-        int w = weights[i];
-        bool v = visited[i];
         if (!visited[i] && weights[i] < smallest)
         {
             smallest = weights[i];
@@ -108,7 +95,7 @@ int disjkstras(int numCities, int** graph)
     {
         if (i > 0)
         {
-            shortest[i] = INT_MAX - 1;
+            shortest[i] = INT_MAX;
         }
         visited[i] = false;
     }
@@ -124,26 +111,22 @@ int disjkstras(int numCities, int** graph)
     }
 
     int currentCity = 0;
-    visited[0] = true;
+    visited[currentCity] = true;
     while (true)
     {
         currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
         visited[currentCity] = true;
 
+        // For the new city we are looking at, lets look at all adjacent cities.
         for (int currentlyLookingAt = 0; currentlyLookingAt < numCities; ++currentlyLookingAt)
         {
             int g = getDistance(graph,currentCity,currentlyLookingAt);
+
+            // If we have not visited this city and its new distance is shorter then our current record, update the record
             if (!visited[currentlyLookingAt] && g > -1 && (shortest[currentCity] + g < shortest[currentlyLookingAt]))
             {
-                // First time inspecting this city
-                if (shortest[currentCity] != (INT_MAX - 1))
-                {
-                    shortest[currentlyLookingAt] = shortest[currentCity] + g;
-                }
-                else
-                {
-                    shortest[currentlyLookingAt] = g;
-                }
+                // Do not want to sum the old record if we have not recorded a previous record
+                shortest[currentlyLookingAt] = g + ((shortest[currentCity] != INT_MAX) ? shortest[currentCity] : 0);
             }
         }
 
@@ -166,7 +149,14 @@ I then spent some time converting that matrix into a more useable format by usin
 I then attempted to use Kruskals’s minimum spanning tree algorithm to attempt to
 find the shortest path from the “capital” to each city but it quickly became apparent that this was not the correct solution.
 
-I then rememberd that Dijkstra's was a fairly standarsd way to visit every node so I tried that next.
+I then rememberd that Dijkstra's was a fairly standard way to visit every node so I tried that next.
+
+I found working with the lower half of the adjacency matrix tricky while implementing Dijkstra so I created a transpose
+matrix and filled in any missing cells.
+
+This allowed me to succesfully implement a working solution however if I had more time I would focus on removing the need
+for it and accessing distances from the input matrix directly. 
+
 */
 int main(int argc, char** argv) {
     char line[LINE_SIZE];
@@ -178,7 +168,7 @@ int main(int argc, char** argv) {
 
     // Create an array of arrays size N
     int** matrix = (int**)malloc((N - 1) * sizeof(int));
-    for (int i = 0; i < (N - 1); i++) {
+    for (int i = 0; i < (N - 1); ++i) {
         matrix[i] = (int*)malloc((i + 1) * sizeof(int));
     }
 
@@ -190,16 +180,16 @@ int main(int argc, char** argv) {
 
     // Invert the matrix to make working with indices slightly easier
     int** transposedMatrix = (int**)malloc((N) * sizeof(int));
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < N; ++i)
     {
         transposedMatrix[i] = (int*)malloc((N - 1) * sizeof(int));
     }
 
     // Populate the transpose matrix
     // TODO: Find way to not need this
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N; ++i) {
 
-        for (int j = 0; j < N - 1; j++)
+        for (int j = 0; j < N - 1; ++j)
         {
             int t;
 
@@ -216,6 +206,8 @@ int main(int argc, char** argv) {
     }
 
     printf("%d", disjkstras(N, transposedMatrix));
+
+    // Cleanup after ourselves
     free(transposedMatrix);
     free(matrix);
     return 0;
