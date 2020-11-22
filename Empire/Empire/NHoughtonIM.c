@@ -28,7 +28,7 @@ int* readLine(char* input, int* row, int size) {
 
 void testMatrix(int** matrix, int size) {
     for (int i = 0; i < (size - 1); i++) {
-        for (int j = 0; j < size - 1 - i; ++j)
+        for (int j = 0; j < size - 1; ++j)
         {
             printf("%d ", matrix[i][j]);
         }
@@ -50,13 +50,14 @@ int findSmallestInArray(int* arr, int n)
     return index;
 }
 
-void printArray(int* arr, int n)
+void printArray(int* arr, int n, bool newLine)
 {
     for (int i = 0; i < n; ++i)
     {
         printf("%d ", arr[i]);
     }
-    printf("\n");
+
+    if (newLine) printf("\n");
 }
 
 void printBoolArray(bool* arr, int n)
@@ -77,7 +78,7 @@ int findClosestNonVisitedCity(int numCities, int* weights, bool* visited)
 {
     int smallest = INT_MAX;
     int index = -1;
-    for (int i = 0; i < numCities; ++i)
+    for (int i = 1; i < numCities; ++i)
     {
         if (!visited[i] && weights[i] < smallest)
         {
@@ -117,82 +118,67 @@ int disjkstras(int numCities, int** graph)
     int* previous = (int*)malloc((numCities) * sizeof(int));
     int* shortest = (int*)malloc((numCities) * sizeof(int));
     bool* visited = (bool*)malloc((numCities) * sizeof(bool));
-    bool* unvisted = (bool*)malloc((numCities) * sizeof(bool));
 
     // Init trackers
     shortest[0] = 0;
+    previous[0] = 0;
     for (int i = 0; i < numCities; ++i)
     {
-        if (i > 0) shortest[i] = INT_MAX;
+        if (i > 0)
+        {
+            shortest[i] = INT_MAX;
+            previous[i] = -1;
+        }
         visited[i] = false;
-        unvisted[i] = true;
     }
-
-
-    //int currentCity = 0;
-    //for (int i = 0; i < numCities - 1; ++i)
-    //{
-
-    //}
-
-    //int currentCity = findClosestNonVisitedCity(numCities, shortest, visited) - 1; // 3
-    //for (int i = 0; i < numCities - currentCity - 1; ++i)
-    //{
-
-    //}
-
+    visited[0] = true;
 
 
     int currentCity = 0;
-    visited[currentCity] = true;
-    unvisted[currentCity] = false;
-    bool initCount = false;
-    while (true)
+
+    for (int i = 0; i < numCities - 1; ++i)
     {
-        //printArray(shortest, numCities);
-        //printArray(graph[currentCity], numCities - currentCity - 1);
-        
-        for (int i = 0; i < numCities - currentCity - 1; ++i)
+        if (graph[0][i] > -1)
         {
-            if (currentCity == 0)
+            shortest[i + 1] = graph[0][i];
+        }
+    }
+    printArray(shortest, numCities, true);
+
+    for (int i = 1; i < numCities - 1; ++i)
+    {
+        currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
+        visited[currentCity] = true;
+        printArray(shortest, numCities, false);
+        printf(" -> ");
+        printArray(previous, numCities, true);
+        printBoolArray(visited, numCities);
+
+        for (int currentlyLookingAt = 1; currentlyLookingAt < numCities; ++currentlyLookingAt)
+        {
+            int g = graph[currentCity-1][currentlyLookingAt];
+            int distanceToCurrentCity = shortest[currentCity];
+            int newShort = shortest[currentlyLookingAt ];
+            bool visit = visited[currentlyLookingAt];
+
+            if (!visit && g > -1 && distanceToCurrentCity != INT_MAX && (distanceToCurrentCity + g < newShort))
             {
-                if (shortest[currentCity + 1 + i] > graph[currentCity][i] && graph[currentCity][i] >= 0)
-                {
-                    shortest[currentCity + 1 + i] = graph[currentCity][i];
-                    previous[currentCity + 1 + i] = currentCity;
-                }
-            }
-            else
-            {
-                if (shortest[currentCity + i] > graph[currentCity][i] && graph[currentCity][i] >= 0)
-                {
-                    shortest[currentCity + i] = graph[currentCity][i];
-                    previous[currentCity + i] = currentCity;
-                }
+                newShort = distanceToCurrentCity + g;
+                shortest[currentlyLookingAt] = newShort;
+                previous[currentlyLookingAt] = currentCity;
             }
         }
 
-        if (initCount)
-        {
-            //printf("Visited city: %d", currentCity + 1);
-            visited[currentCity + 1] = true;
-            unvisted[currentCity + 1] = false;
-        }
-        initCount = true;
 
-        //printBoolArray(visited, numCities);
-        printArray(shortest, numCities);
-        //printBoolArray(visited, numCities);
-        currentCity = findClosestNonVisitedCity(numCities, shortest, visited) - 1;
-
-        if (visitedAllCities(visited, numCities))
-        {
-            break;
-        }
+        printArray(shortest, numCities, false);
+        printf(" -> ");
+        printArray(previous, numCities, true);
+        printBoolArray(visited, numCities);
+        printf("\n");
     }
 
 
-
+    printArray(shortest, numCities, true);
     return sumDistance(numCities, shortest);
 }
 
@@ -232,11 +218,20 @@ int main(int argc, char** argv) {
 
     int** transposedMatrix = (int**)malloc((N - 1) * sizeof(int));
     for (int i = 0; i < (N - 1); i++) {
-        transposedMatrix[i] = (int*)malloc((N - 1 - i) * sizeof(int));
-        for (int j = i; j < N - 1; ++j)
+        transposedMatrix[i] = (int*)malloc((N - 1) * sizeof(int));
+        for (int j = 0; j < (N - 1); ++j)
         {
-            int t = matrix[j][i];
-            transposedMatrix[i][j - i] = matrix[j][i];
+            int t;
+            
+            if (j < i)
+            {
+                t = -1;
+            }
+            else
+            {
+                t = matrix[j][i];
+            }
+            transposedMatrix[i][j] = t;
         }
     }
     testMatrix(transposedMatrix, N);
