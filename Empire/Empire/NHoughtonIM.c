@@ -39,40 +39,6 @@ void testMatrix(int** matrix, int size) {
     }
 }
 
-int findSmallestInArray(int* arr, int n)
-{
-    int smallest = INT_MAX, index = 0;
-    for (int i = 0; i < n; ++i)
-    {
-        if (arr[i] < n)
-        {
-            smallest = arr[i];
-            index = i;
-        }
-    }
-    return index;
-}
-
-void printArray(int* arr, int n, bool newLine)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        printf("%d:%d ", i, arr[i]);
-    }
-
-    if (newLine) printf("\n");
-}
-
-void printBoolArray(bool* arr, int n)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        bool v = arr[i];
-        printf("%s ", v ? "true" : "false");
-    }
-    printf("\n");
-}
-
 // ====================================== //
 // Dijkstra's
 // ====================================== //
@@ -108,7 +74,7 @@ bool visitedAllCities(bool* visited, int numCities)
     return true;
 }
 
-int largestDistance(int numCities, int* distances)
+int inline largestDistance(int numCities, int* distances)
 {
     int largest = 0;
     for (int i = 0; i < numCities; ++i)
@@ -147,6 +113,8 @@ int disjkstras(int numCities, int** graph)
         visited[i] = false;
     }
 
+    // We can immediately populate the shortest path
+    // From the source city
     for (int i = 0; i < numCities; ++i)
     {
         if (graph[0][i] > -1)
@@ -165,7 +133,6 @@ int disjkstras(int numCities, int** graph)
         for (int currentlyLookingAt = 0; currentlyLookingAt < numCities; ++currentlyLookingAt)
         {
             int g = getDistance(graph,currentCity,currentlyLookingAt);
-            
             if (!visited[currentlyLookingAt] && g > -1 && (shortest[currentCity] + g < shortest[currentlyLookingAt]))
             {
                 // First time inspecting this city
@@ -179,6 +146,7 @@ int disjkstras(int numCities, int** graph)
                 }
             }
         }
+
         if (visitedAllCities(visited, numCities))
         {
             break; // Disjkstra complete
@@ -198,7 +166,7 @@ I then spent some time converting that matrix into a more useable format by usin
 I then attempted to use Kruskals’s minimum spanning tree algorithm to attempt to
 find the shortest path from the “capital” to each city but it quickly became apparent that this was not the correct solution.
 
-I then rememberd that Dijkstra's was a fairly standrad way to visit every node so I tried that next.
+I then rememberd that Dijkstra's was a fairly standarsd way to visit every node so I tried that next.
 */
 int main(int argc, char** argv) {
     char line[LINE_SIZE];
@@ -206,7 +174,6 @@ int main(int argc, char** argv) {
 
     // Get the N value
     fgets(line, LINE_SIZE, stdin);
-
     N = readNumber(line);
 
     // Create an array of arrays size N
@@ -228,6 +195,8 @@ int main(int argc, char** argv) {
         transposedMatrix[i] = (int*)malloc((N - 1) * sizeof(int));
     }
 
+    // Populate the transpose matrix
+    // TODO: Find way to not need this
     for (int i = 0; i < N; i++) {
 
         for (int j = 0; j < N - 1; j++)
@@ -246,10 +215,8 @@ int main(int argc, char** argv) {
         }
     }
 
-    free(matrix);
-    int result = disjkstras(N, transposedMatrix);
-    assert(result == 35);
-    printf("%d", result);
+    printf("%d", disjkstras(N, transposedMatrix));
     free(transposedMatrix);
+    free(matrix);
     return 0;
 }
