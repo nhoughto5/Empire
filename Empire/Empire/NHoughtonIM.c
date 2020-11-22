@@ -158,6 +158,22 @@ matrix and filled in any missing cells.
 
 This allowed me to succesfully implement a working solution. However if I had more time I would focus on removing the need
 for it and accessing distances from the input matrix directly. 
+
+Time Log:
+    11/20/2020: About 45 minutes reading and understanding the problem
+    11/21/2020: ~ 4.5 hours to get a basic working solution
+    11/22/2020: ~ 2.5 hours of dev time debugging and optimizing. Another 1hr to come up with a second test sample and testing. 
+
+Additional sample input tested:
+9
+4
+x 8
+x x 7
+x x x 9
+x x 4 14 10
+x x x x x 2
+8 11 x x x x 1
+x x 2 x x x 6 7
 ============================================================================================================================
 
 ~~~~~~~~~~~~
