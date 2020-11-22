@@ -27,8 +27,8 @@ int* readLine(char* input, int* row, int size) {
 }
 
 void testMatrix(int** matrix, int size) {
-    for (int i = 0; i < (size - 1); i++) {
-        for (int j = 0; j < size - 1; j++)
+    for (int i = 0; i < size; i++) {
+        for (int j = 1; j < size; j++)
         {
             printf("%d:%d=%d ", i,j,matrix[i][j]);
         }
@@ -142,13 +142,13 @@ int disjkstras(int numCities, int** graph)
 
     int currentCity = 0;
 
-    for (int i = 0; i < numCities - 1; ++i)
-    {
-        if (graph[0][i] > -1)
-        {
-            shortest[i + 1] = graph[0][i];
-        }
-    }
+    //for (int i = 0; i < numCities - 1; ++i)
+    //{
+    //    if (graph[0][i] > -1)
+    //    {
+    //        shortest[i + 1] = graph[0][i];
+    //    }
+    //}
     while(true)
     {
         //printBoolArray(visited, numCities);
@@ -159,7 +159,7 @@ int disjkstras(int numCities, int** graph)
         for (int currentlyLookingAt = (numCities-1); currentlyLookingAt >= 1; --currentlyLookingAt)
         {
             //int g1 = graph[currentlyLookingAt-1][currentCity-1];
-            int g = graph[currentCity][currentlyLookingAt-1];
+            int g = graph[currentCity][currentlyLookingAt];
             int distanceToCurrentCity = shortest[currentCity];
             int newShort = shortest[currentlyLookingAt ];
             bool visit = visited[currentlyLookingAt];
@@ -233,11 +233,11 @@ int main(int argc, char** argv) {
     int** transposedMatrix = (int**)malloc((N) * sizeof(int));
     for (int i = 0; i < N; i++)
     {
-        transposedMatrix[i] = (int*)malloc((N) * sizeof(int));
+        transposedMatrix[i] = (int*)malloc((N-1) * sizeof(int));
     }
     for (int i = 0; i < N; i++) {
         
-        for (int j = 0; j < N; j++)
+        for (int j = 0; j < N-1; j++)
         {
             int t;
             
@@ -249,10 +249,8 @@ int main(int argc, char** argv) {
             {
                 t = matrix[j][i];
             }
-            printf("%d:%d=%d ", i, j, t);
-            transposedMatrix[i][j] = t;
+            transposedMatrix[i][j+1] = t;
         }
-        printf("\n");
     }
     testMatrix(transposedMatrix, N);
     free(matrix);
