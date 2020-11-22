@@ -133,23 +133,19 @@ int inline getDistance(int** graph, int x, int y)
 
 int disjkstras(int numCities, int** graph)
 {
-    int* previous = (int*)malloc((numCities) * sizeof(int));
     int* shortest = (int*)malloc((numCities) * sizeof(int));
     bool* visited = (bool*)malloc((numCities) * sizeof(bool));
 
     // Init trackers
     shortest[0] = 0;
-    previous[0] = 0;
     for (int i = 0; i < numCities; ++i)
     {
         if (i > 0)
         {
             shortest[i] = INT_MAX - 1;
-            previous[i] = -1;
         }
         visited[i] = false;
     }
-
 
     for (int i = 0; i < numCities; ++i)
     {
@@ -181,7 +177,6 @@ int disjkstras(int numCities, int** graph)
                 {
                     shortest[currentlyLookingAt] = g;
                 }
-                previous[currentlyLookingAt] = currentCity;
             }
         }
         if (visitedAllCities(visited, numCities))
@@ -250,10 +245,10 @@ int main(int argc, char** argv) {
             transposedMatrix[i][j + 1] = t;
         }
     }
-    testMatrix(transposedMatrix, N);
+
     free(matrix);
     int result = disjkstras(N, transposedMatrix);
-    assert(result == 21);
+    assert(result == 35);
     printf("%d", result);
     free(transposedMatrix);
     return 0;
