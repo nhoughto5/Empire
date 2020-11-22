@@ -2,11 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <assert.h>
+
 #define LINE_SIZE 20
 
 // ====================================== //
 // Utilities
 // ====================================== //
+
 inline int readNumber(char* input) {
     int ret;
     //sscanf should fill a single variable (i.e. N), if not something has gone wrong 
@@ -30,7 +33,7 @@ void testMatrix(int** matrix, int size) {
     for (int i = 0; i < size; i++) {
         for (int j = 1; j < size; j++)
         {
-            printf("%d:%d=%d ", i,j,matrix[i][j]);
+            printf("%d:%d=%d ", i, j, matrix[i][j]);
         }
         printf("\n");
     }
@@ -54,7 +57,7 @@ void printArray(int* arr, int n, bool newLine)
 {
     for (int i = 0; i < n; ++i)
     {
-        printf("%d:%d ",i, arr[i]);
+        printf("%d:%d ", i, arr[i]);
     }
 
     if (newLine) printf("\n");
@@ -119,6 +122,15 @@ int largestDistance(int numCities, int* distances)
     return largest;
 }
 
+int inline getDistance(int** graph, int x, int y)
+{
+    int ret1 = graph[x][y];
+    if (ret1 > -1) return ret1;
+    int ret2 = graph[y][x];
+    if (ret2 > -1) return ret2;
+    return -1;
+}
+
 int disjkstras(int numCities, int** graph)
 {
     int* previous = (int*)malloc((numCities) * sizeof(int));
@@ -132,15 +144,12 @@ int disjkstras(int numCities, int** graph)
     {
         if (i > 0)
         {
-            shortest[i] = INT_MAX-1;
+            shortest[i] = INT_MAX - 1;
             previous[i] = -1;
         }
         visited[i] = false;
     }
-    visited[0] = true;
 
-
-    int currentCity = 0;
 
     for (int i = 0; i < numCities; ++i)
     {
@@ -149,70 +158,39 @@ int disjkstras(int numCities, int** graph)
             shortest[i] = graph[0][i];
         }
     }
-    printArray(shortest, numCities, true);
-    while(true)
+
+    int currentCity = 0;
+    visited[0] = true;
+
+    while (true)
     {
-        //printBoolArray(visited, numCities);
         currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
         visited[currentCity] = true;
-        printArray(shortest, numCities, true);
-        printf("Investigating %d: ", currentCity);
-        for (int currentlyLookingAt = (numCities-1); currentlyLookingAt >= 1; --currentlyLookingAt)
+        for (int currentlyLookingAt = (numCities - 1); currentlyLookingAt >= 1; --currentlyLookingAt)
         {
-            //int g1 = graph[currentlyLookingAt-1][currentCity-1];
-            int g = graph[currentCity][currentlyLookingAt];
-            int g1 = graph[currentlyLookingAt][currentCity];
-            int distanceToCurrentCity = shortest[currentCity];
-            int newShort = shortest[currentlyLookingAt ];
-            bool visit = visited[currentlyLookingAt];
+            int g = getDistance(graph,currentCity,currentlyLookingAt);
 
-            if (!visit && g > -1 && (distanceToCurrentCity + g < newShort))
+            if (!visited[currentlyLookingAt] && g > -1 && (shortest[currentCity] + g < shortest[currentlyLookingAt]))
             {
-                if (distanceToCurrentCity != (INT_MAX - 1))
+                // First time inspecting this city
+                if (shortest[currentCity] != (INT_MAX - 1))
                 {
-                    printf("%d ", currentlyLookingAt);
-                    newShort = distanceToCurrentCity + g;
-                    shortest[currentlyLookingAt] = newShort;
-                    previous[currentlyLookingAt] = currentCity;
+                    shortest[currentlyLookingAt] = shortest[currentCity] + g;
                 }
                 else
                 {
-                    printf("%d ", currentlyLookingAt);
-                    newShort = g;
-                    shortest[currentlyLookingAt] = newShort;
-                    previous[currentlyLookingAt] = currentCity;
+                    shortest[currentlyLookingAt] = g;
                 }
-            }
-
-            if (!visit && g1 > -1 && (distanceToCurrentCity + g1 < newShort))
-            {
-                if (distanceToCurrentCity != (INT_MAX - 1))
-                {
-                    printf("%d ", currentlyLookingAt);
-                    newShort = distanceToCurrentCity + g1;
-                    shortest[currentlyLookingAt] = newShort;
-                    previous[currentlyLookingAt] = currentCity;
-                }
-                else
-                {
-                    printf("%d ", currentlyLookingAt);
-                    newShort = g1;
-                    shortest[currentlyLookingAt] = newShort;
-                    previous[currentlyLookingAt] = currentCity;
-                }
+                previous[currentlyLookingAt] = currentCity;
             }
         }
-        printf("\n");
-
-        printArray(shortest, numCities, true);
 
         if (visitedAllCities(visited, numCities))
         {
-            break;
+            break; // Disjkstra complete
         }
     }
 
-    printArray(shortest, numCities, true);
     return largestDistance(numCities, shortest);
 }
 
@@ -238,7 +216,6 @@ int main(int argc, char** argv) {
     N = readNumber(line);
 
     // Create an array of arrays size N
-    // Invert the matrix to make dijkstra easier
     int** matrix = (int**)malloc((N - 1) * sizeof(int));
     for (int i = 0; i < (N - 1); i++) {
         matrix[i] = (int*)malloc((i + 1) * sizeof(int));
@@ -250,18 +227,20 @@ int main(int argc, char** argv) {
         ++ii;
     }
 
+    // Invert the matrix to make working with indices slightly easier
     int** transposedMatrix = (int**)malloc((N) * sizeof(int));
     for (int i = 0; i < N; i++)
     {
-        transposedMatrix[i] = (int*)malloc((N-1) * sizeof(int));
+        transposedMatrix[i] = (int*)malloc((N - 1) * sizeof(int));
     }
+
     for (int i = 0; i < N; i++) {
-        
-        for (int j = 0; j < N-1; j++)
+
+        for (int j = 0; j < N - 1; j++)
         {
             int t;
-            
-            if (j < i || i >= (N-1) || j >= (N-1))
+
+            if (j < i || i >= (N - 1) || j >= (N - 1))
             {
                 t = -1;
             }
@@ -269,12 +248,14 @@ int main(int argc, char** argv) {
             {
                 t = matrix[j][i];
             }
-            transposedMatrix[i][j+1] = t;
+            transposedMatrix[i][j + 1] = t;
         }
     }
     testMatrix(transposedMatrix, N);
     free(matrix);
-    printf("%d", disjkstras(N, transposedMatrix));
+    int result = disjkstras(N, transposedMatrix);
+    assert(result == 35);
+    printf("%d", result);
     free(transposedMatrix);
     return 0;
 }
