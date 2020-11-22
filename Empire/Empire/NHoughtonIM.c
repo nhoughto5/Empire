@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
+#include <limits.h>
 #define LINE_SIZE 20
 
 // ====================================== //
