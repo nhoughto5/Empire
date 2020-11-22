@@ -161,15 +161,15 @@ int disjkstras(int numCities, int** graph)
 
     int currentCity = 0;
     visited[0] = true;
-
     while (true)
     {
         currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
         visited[currentCity] = true;
-        for (int currentlyLookingAt = (numCities - 1); currentlyLookingAt >= 1; --currentlyLookingAt)
+
+        for (int currentlyLookingAt = 0; currentlyLookingAt < numCities; ++currentlyLookingAt)
         {
             int g = getDistance(graph,currentCity,currentlyLookingAt);
-
+            
             if (!visited[currentlyLookingAt] && g > -1 && (shortest[currentCity] + g < shortest[currentlyLookingAt]))
             {
                 // First time inspecting this city
@@ -184,7 +184,6 @@ int disjkstras(int numCities, int** graph)
                 previous[currentlyLookingAt] = currentCity;
             }
         }
-
         if (visitedAllCities(visited, numCities))
         {
             break; // Disjkstra complete
@@ -254,7 +253,7 @@ int main(int argc, char** argv) {
     testMatrix(transposedMatrix, N);
     free(matrix);
     int result = disjkstras(N, transposedMatrix);
-    assert(result == 35);
+    assert(result == 21);
     printf("%d", result);
     free(transposedMatrix);
     return 0;
