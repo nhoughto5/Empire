@@ -140,11 +140,13 @@ int disjkstras(int numCities, int** graph)
 }
 
 /*
+============================================================================================================================
 Began this problem by reacquainting myself with C99 as it has been a long time since I have used it.
 It took a little while to figure out the best dev environment but I went with visual studio even though its implementation of C99 is missing some features.
 
 I then proceeded to tackle some basics, reading standard input, parsing the input and storing it into a usable matrix format.
 I then spent some time converting that matrix into a more useable format by using C99’s struct features.
+This in the end didn't prove to be useful so I removed that. 
 
 I then attempted to use Kruskals’s minimum spanning tree algorithm to attempt to
 find the shortest path from the “capital” to each city but it quickly became apparent that this was not the correct solution.
@@ -154,9 +156,18 @@ I then rememberd that Dijkstra's was a fairly standard way to visit every node s
 I found working with the lower half of the adjacency matrix tricky while implementing Dijkstra so I created a transpose
 matrix and filled in any missing cells.
 
-This allowed me to succesfully implement a working solution however if I had more time I would focus on removing the need
+This allowed me to succesfully implement a working solution. However if I had more time I would focus on removing the need
 for it and accessing distances from the input matrix directly. 
+============================================================================================================================
 
+~~~~~~~~~~~~
+PLEASE NOTE:
+~~~~~~~~~~~~
+    I "inlined" a few helper functions to boost performance. I had no issues with this in Visual Studio or with a CLANG compliler. 
+    My locally installed MinGW compiler however, did not like the inline for some reason. If I had more time I would add some precompiler 
+    statements to ensure portability with the inline command.
+
+    If you have any compile issues with it when you run your test please let me know and I will send you a new version without them.
 */
 int main(int argc, char** argv) {
     char line[LINE_SIZE];
