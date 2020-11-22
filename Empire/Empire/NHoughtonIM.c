@@ -142,24 +142,26 @@ int disjkstras(int numCities, int** graph)
 
     int currentCity = 0;
 
-    //for (int i = 0; i < numCities - 1; ++i)
-    //{
-    //    if (graph[0][i] > -1)
-    //    {
-    //        shortest[i + 1] = graph[0][i];
-    //    }
-    //}
+    for (int i = 0; i < numCities - 1; ++i)
+    {
+        if (graph[0][i] > -1)
+        {
+            shortest[i] = graph[0][i];
+        }
+    }
+    printArray(shortest, numCities, true);
     while(true)
     {
         //printBoolArray(visited, numCities);
         currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
         visited[currentCity] = true;
-        //printArray(shortest, numCities, true);
+        printArray(shortest, numCities, true);
         printf("Investigating %d: ", currentCity);
         for (int currentlyLookingAt = (numCities-1); currentlyLookingAt >= 1; --currentlyLookingAt)
         {
             //int g1 = graph[currentlyLookingAt-1][currentCity-1];
             int g = graph[currentCity][currentlyLookingAt];
+            int g1 = graph[currentlyLookingAt][currentCity];
             int distanceToCurrentCity = shortest[currentCity];
             int newShort = shortest[currentlyLookingAt ];
             bool visit = visited[currentlyLookingAt];
@@ -177,6 +179,24 @@ int disjkstras(int numCities, int** graph)
                 {
                     printf("%d ", currentlyLookingAt);
                     newShort = g;
+                    shortest[currentlyLookingAt] = newShort;
+                    previous[currentlyLookingAt] = currentCity;
+                }
+            }
+
+            if (!visit && g1 > -1 && (distanceToCurrentCity + g1 < newShort))
+            {
+                if (distanceToCurrentCity != (INT_MAX - 1))
+                {
+                    printf("%d ", currentlyLookingAt);
+                    newShort = distanceToCurrentCity + g1;
+                    shortest[currentlyLookingAt] = newShort;
+                    previous[currentlyLookingAt] = currentCity;
+                }
+                else
+                {
+                    printf("%d ", currentlyLookingAt);
+                    newShort = g1;
                     shortest[currentlyLookingAt] = newShort;
                     previous[currentlyLookingAt] = currentCity;
                 }
