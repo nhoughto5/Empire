@@ -16,27 +16,6 @@ int readNumber(char* input) {
     return ret;
 }
 
-int* readLine(char* input, int* row, int size) {
-    char* str = strtok(input, " ");
-    int i = 0;
-    while (str != NULL) {
-        int value = readNumber(str);
-        row[i] = value;
-        str = strtok(NULL, " ");
-        ++i;
-    }
-    return row;
-}
-
-void printArray(int* arr, int n, bool newLine)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        printf("%d:%d ", i, arr[i]);
-    }
-
-    if (newLine) printf("\n");
-}
 
 // ====================================== //
 // Dijkstra's
@@ -96,10 +75,8 @@ int getDistance(int** graph, int x, int y)
 
 int disjkstras(int numCities, int** graph)
 {
-    //int* shortest = (int*)malloc((numCities) * sizeof(int));
     int shortest[numCities];
     bool visited[numCities];
-    //bool* visited = (bool*)malloc((numCities) * sizeof(bool));
 
     // Init trackers
     shortest[0] = 0;
@@ -126,7 +103,6 @@ int disjkstras(int numCities, int** graph)
     visited[currentCity] = true;
     while (true)
     {
-        printf("Current City %d: ", currentCity);
         currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
         visited[currentCity] = true;
 
@@ -142,7 +118,7 @@ int disjkstras(int numCities, int** graph)
                 shortest[currentlyLookingAt] = g + ((shortest[currentCity] != INT_MAX) ? shortest[currentCity] : 0);
             }
         }
-        printArray(shortest, numCities, true);
+
         if (visitedAllCities(visited, numCities))
         {
             break; // Disjkstra complete
@@ -183,7 +159,6 @@ int main(int argc, char** argv) {
 
     int ii = 0;
     while (fgets(line, LINE_SIZE, stdin)) {
-        //int row[N];
         char* str = strtok(line, " ");
         int i = 0;
         while (str != NULL) {
@@ -194,7 +169,6 @@ int main(int argc, char** argv) {
         }
         ii++;
     }
-
 
     // Invert the matrix to make working with indices slightly easier
     int** transposedMatrix = (int**)malloc((N) * sizeof(int));
@@ -219,6 +193,7 @@ int main(int argc, char** argv) {
             {
                 t = matrix[j][i];
             }
+            
             transposedMatrix[i][j + 1] = t;
         }
     }
