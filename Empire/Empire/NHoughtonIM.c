@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,14 +13,13 @@
 inline int readNumber(char* input) {
     int ret;
     //sscanf should fill a single variable (i.e. N), if not something has gone wrong 
-    if (sscanf(input, "%d", &ret) != 1) return -1;
+    if (sscanf_s(input, "%d", &ret) != 1) return -1;
     return ret;
 }
 
 // ====================================== //
 // Dijkstra's
 // ====================================== //
-
 
 int findClosestNonVisitedCity(int numCities, int* weights, bool* visited)
 {
