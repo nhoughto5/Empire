@@ -103,12 +103,13 @@ int inline getDistance(int** graph, int currentCity, int lookAt)
     {
         return -1;
     }
-    else if (lookAt > currentCity)
+    else if (currentCity >= lookAt)
     {
-        return graph[currentCity][lookAt -1];
+        //return graph[currentCity][lookAt -1];
+        return graph[currentCity - 1][lookAt];
     }
 
-    return graph[currentCity - 1][lookAt];
+    return graph[lookAt - 1][currentCity];
 }
 
 int disjkstras(int numCities, int** graph)
@@ -131,7 +132,10 @@ int disjkstras(int numCities, int** graph)
     // From the source city
     for (int i = 0; i < numCities-1; ++i)
     {
-        shortest[i+1] = graph[i][0];
+        if (graph[i][0] > -1)
+        {
+            shortest[i + 1] = graph[i][0];
+        }
     }
     printArray(shortest, numCities, true);
     int currentCity = 0;
@@ -148,10 +152,20 @@ int disjkstras(int numCities, int** graph)
             int g = getDistance(graph, currentCity, currentlyLookingAt);
 
             // If we have not visited this city and its new distance is shorter then our current record, update the record
-            if (!visited[currentlyLookingAt] && g > -1 && (shortest[currentCity] + g < shortest[currentlyLookingAt]))
+            int sC = shortest[currentCity];
+            int sL = shortest[currentlyLookingAt];
+            int v = visited[currentlyLookingAt];
+            if (!visited[currentlyLookingAt] && g > -1 && ((sC + g) < sL))
             {
                 // Do not want to sum the old record if we have not recorded a previous record
-                shortest[currentlyLookingAt] = g + ((shortest[currentCity] != INT_MAX) ? shortest[currentCity] : 0);
+                if (sC != INT_MAX)
+                {
+                    shortest[currentlyLookingAt] = g + sC;
+                }
+                else
+                {
+                    shortest[currentlyLookingAt] = g;
+                }
             }
         }
         printArray(shortest, numCities, true);
