@@ -9,23 +9,21 @@
 // Utilities
 // ====================================== //
 
-inline int readNumber(char* input) {
+int readNumber(char* input) {
     int ret;
-    //sscanf should fill a single variable (i.e. N), if not something has gone wrong 
+    //sscanf should fill a single variable (i.e. N), if not something has gone wrong
     if (sscanf(input, "%d", &ret) != 1) return -1;
     return ret;
 }
 
-int* readLine(char* input, int* row, int size) {
-    char* str = strtok(input, " ");
-    int i = 0;
-    while (str != NULL) {
-        int value = readNumber(str);
-        row[i] = value;
-        str = strtok(NULL, " ");
-        ++i;
+void printArray(int* arr, int n, bool newLine)
+{
+    for (int i = 0; i < n; ++i)
+    {
+        printf("%d:%d ", i, arr[i]);
     }
-    return row;
+
+    if (newLine) printf("\n");
 }
 
 // ====================================== //
@@ -61,7 +59,7 @@ bool visitedAllCities(bool* visited, int numCities)
     return true;
 }
 
-int inline largestDistance(int numCities, int* distances)
+int largestDistance(int numCities, int* distances)
 {
     int largest = 0;
     for (int i = 0; i < numCities; ++i)
@@ -75,7 +73,7 @@ int inline largestDistance(int numCities, int* distances)
     return largest;
 }
 
-int inline getDistance(int** graph, int x, int y)
+int getDistance(int numCities, int graph[][numCities], int x, int y)
 {
     int ret1 = graph[x][y];
     if (ret1 > -1) return ret1;
@@ -84,13 +82,13 @@ int inline getDistance(int** graph, int x, int y)
     return -1;
 }
 
-int disjkstras(int numCities, int** graph)
+int disjkstras(int numCities, int graph[][numCities])
 {
-    int* shortest = (int*)malloc((numCities) * sizeof(int));
-    bool* visited = (bool*)malloc((numCities) * sizeof(bool));
+    int shortest[numCities];
+    bool visited[numCities];
 
     // Init trackers
-    shortest[0] = 0;
+    
     for (int i = 0; i < numCities; ++i)
     {
         if (i > 0)
@@ -112,6 +110,7 @@ int disjkstras(int numCities, int** graph)
 
     int currentCity = 0;
     visited[currentCity] = true;
+    shortest[0] = 0;
     while (true)
     {
         currentCity = findClosestNonVisitedCity(numCities, shortest, visited);
@@ -120,7 +119,7 @@ int disjkstras(int numCities, int** graph)
         // For the new city we are looking at, lets look at all adjacent cities.
         for (int currentlyLookingAt = 0; currentlyLookingAt < numCities; ++currentlyLookingAt)
         {
-            int g = getDistance(graph,currentCity,currentlyLookingAt);
+            int g = getDistance(numCities, graph,currentCity,currentlyLookingAt);
 
             // If we have not visited this city and its new distance is shorter then our current record, update the record
             if (!visited[currentlyLookingAt] && g > -1 && (shortest[currentCity] + g < shortest[currentlyLookingAt]))
@@ -129,7 +128,6 @@ int disjkstras(int numCities, int** graph)
                 shortest[currentlyLookingAt] = g + ((shortest[currentCity] != INT_MAX) ? shortest[currentCity] : 0);
             }
         }
-
         if (visitedAllCities(visited, numCities))
         {
             break; // Disjkstra complete
@@ -140,23 +138,42 @@ int disjkstras(int numCities, int** graph)
 }
 
 /*
+* NOTES
+============================================================================================================================
 Began this problem by reacquainting myself with C99 as it has been a long time since I have used it.
 It took a little while to figure out the best dev environment but I went with visual studio even though its implementation of C99 is missing some features.
-
 I then proceeded to tackle some basics, reading standard input, parsing the input and storing it into a usable matrix format.
 I then spent some time converting that matrix into a more useable format by using C99’s struct features.
-
+This in the end didn't prove to be useful so I removed that. 
 I then attempted to use Kruskals’s minimum spanning tree algorithm to attempt to
 find the shortest path from the “capital” to each city but it quickly became apparent that this was not the correct solution.
-
 I then rememberd that Dijkstra's was a fairly standard way to visit every node so I tried that next.
-
 I found working with the lower half of the adjacency matrix tricky while implementing Dijkstra so I created a transpose
 matrix and filled in any missing cells.
-
-This allowed me to succesfully implement a working solution however if I had more time I would focus on removing the need
+This allowed me to succesfully implement a working solution. However if I had more time I would focus on removing the need
 for it and accessing distances from the input matrix directly. 
-
+Time Log:
+    11/20/2020: About 45 minutes reading and understanding the problem
+    11/21/2020: ~ 4.5 hours to get a basic working solution
+    11/22/2020: ~ 2.5 hours of dev time debugging and optimizing. Another 1hr to come up with a second test sample and testing. 
+Additional sample input tested:
+9
+4
+x 8
+x x 7
+x x x 9
+x x 4 14 10
+x x x x x 2
+8 11 x x x x 1
+x x 2 x x x 6 7
+============================================================================================================================
+~~~~~~~~~~~~
+PLEASE NOTE:
+~~~~~~~~~~~~
+    I "inlined" a few helper functions to boost performance. I had no issues with this in Visual Studio or with a CLANG compliler. 
+    My locally installed MinGW compiler however, did not like the inline for some reason. If I had more time I would add some precompiler 
+    statements to ensure portability with the inline command.
+    If you have any compile issues with it when you run your test please let me know and I will send you a new version without them.
 */
 int main(int argc, char** argv) {
     char line[LINE_SIZE];
@@ -165,31 +182,29 @@ int main(int argc, char** argv) {
     // Get the N value
     fgets(line, LINE_SIZE, stdin);
     N = readNumber(line);
-
-    // Create an array of arrays size N
-    int** matrix = (int**)malloc((N - 1) * sizeof(int));
-    for (int i = 0; i < (N - 1); ++i) {
-        matrix[i] = (int*)malloc((i + 1) * sizeof(int));
-    }
+    int matrix[N][N];
 
     int ii = 0;
     while (fgets(line, LINE_SIZE, stdin)) {
-        matrix[ii] = readLine(line, matrix[ii], ii);
-        ++ii;
+        char* str = strtok(line, " ");
+        int i = 0;
+        while (str != NULL) {
+            int value = readNumber(str);
+            matrix[ii][i] = value;
+            str = strtok(NULL, " ");
+            ++i;
+        }
+        ii++;
     }
 
     // Invert the matrix to make working with indices slightly easier
-    int** transposedMatrix = (int**)malloc((N) * sizeof(int));
-    for (int i = 0; i < N; ++i)
-    {
-        transposedMatrix[i] = (int*)malloc((N - 1) * sizeof(int));
-    }
+    int transposedMatrix[N][N];
 
     // Populate the transpose matrix
     // TODO: Find way to not need this
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < N; i++) {
 
-        for (int j = 0; j < N - 1; ++j)
+        for (int j = 0; j < N - 1; j++)
         {
             int t;
 
@@ -205,10 +220,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    printf("%d", disjkstras(N, transposedMatrix));
-
-    // Cleanup after ourselves
-    free(transposedMatrix);
-    free(matrix);
+    printf("%d\n", disjkstras(N, transposedMatrix));
     return 0;
 }
