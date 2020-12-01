@@ -16,26 +16,6 @@ inline int readNumber(char* input) {
     return ret;
 }
 
-void printArray(int* arr, int n, bool newLine)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        printf("%d:%d ", i, arr[i]);
-    }
-
-    if (newLine) printf("\n");
-}
-
-void printBoolArray(bool* arr, int n)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        bool v = arr[i];
-        printf("%s ", v ? "true" : "false");
-    }
-    printf("\n");
-}
-
 // ====================================== //
 // Dijkstra's
 // ====================================== //
@@ -45,11 +25,9 @@ int findClosestNonVisitedCity(int numCities, int* weights, bool* visited)
 {
     int smallest = INT_MAX;
     int index = -1;
-    printBoolArray(visited, numCities);
     for (int i = 1; i < numCities; ++i)
     {
         if (!visited[i] && weights[i] < smallest && weights[i] > -1)
-        //if (!visited[i] && weights[i] < smallest)
         {
             smallest = weights[i];
             index = i;
@@ -137,7 +115,7 @@ int disjkstras(int numCities, int** graph)
             shortest[i + 1] = graph[i][0];
         }
     }
-    printArray(shortest, numCities, true);
+
     int currentCity = 0;
     visited[currentCity] = true;
     while (true)
@@ -152,15 +130,12 @@ int disjkstras(int numCities, int** graph)
             int g = getDistance(graph, currentCity, currentlyLookingAt);
 
             // If we have not visited this city and its new distance is shorter then our current record, update the record
-            int sC = shortest[currentCity];
-            int sL = shortest[currentlyLookingAt];
-            int v = visited[currentlyLookingAt];
-            if (!visited[currentlyLookingAt] && g > -1 && ((sC + g) < sL))
+            if (!visited[currentlyLookingAt] && g > -1 && ((shortest[currentCity] + g) < shortest[currentlyLookingAt]))
             {
                 // Do not want to sum the old record if we have not recorded a previous record
-                if (sC != INT_MAX)
+                if (shortest[currentCity] != INT_MAX)
                 {
-                    shortest[currentlyLookingAt] = g + sC;
+                    shortest[currentlyLookingAt] = g + shortest[currentCity];
                 }
                 else
                 {
@@ -168,7 +143,7 @@ int disjkstras(int numCities, int** graph)
                 }
             }
         }
-        printArray(shortest, numCities, true);
+
         if (visitedAllCities(visited, numCities))
         {
             break; // Disjkstra complete
@@ -243,15 +218,12 @@ int main(int argc, char** argv) {
     while (fgets(line, LINE_SIZE, stdin)) {
         char* str = strtok(line, " ");
         int i = 0;
-        printf("%d:  ", ii);
         while (str != NULL) {
             int value = readNumber(str);
-            printf("%d,%d: %d  ", ii, i, value);
             matrix[ii][i] = value;
             str = strtok(NULL, " ");
             ++i;
         }
-        printf("\n");
         ii++;
     }
 
